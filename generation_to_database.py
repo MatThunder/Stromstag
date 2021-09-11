@@ -10,7 +10,7 @@ current_date = end_date.strftime("%Y%m%d")
 
 client = EntsoePandasClient(api_key='444fc771-5d0f-499f-9328-90c05c459219')
 
-start = pd.Timestamp('20201109', tz='Europe/Brussels')
+start = pd.Timestamp('20210907', tz='Europe/Brussels')
 end = pd.Timestamp(current_date, tz='Europe/Brussels') #fda
 country_code = 'DE'
 

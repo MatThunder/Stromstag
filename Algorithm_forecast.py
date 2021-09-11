@@ -69,10 +69,10 @@ client = EntsoePandasClient(api_key='444fc771-5d0f-499f-9328-90c05c459219')
 
 
 #start and end date format
-start_date_raw = date.today()+timedelta(days=1)
+start_date_raw = date.today()+timedelta(days=-2)
 start_date = start_date_raw.strftime("%Y%m%d")
 
-end_date_raw = date.today()+timedelta(days=2)
+end_date_raw = date.today()+timedelta(days=-1)
 end_date = end_date_raw.strftime("%Y%m%d")
 
 #quering load and renewable generation forecasts
@@ -81,6 +81,7 @@ end = pd.Timestamp(end_date, tz='Europe/Brussels')
 country_code = 'DE'
 load_raw = client.query_load_forecast(country_code, start=start, end=end)
 renewable = client.query_wind_and_solar_forecast(country_code, start=start, end=end)
+print('hier')
 
 #formating load_raw to pandas dataframe
 load = pd.DataFrame(load_raw)
