@@ -1,0 +1,186 @@
+{% extends "Stromzeiten_app/base.html" %}
+{% load static %}
+{% block content %}
+<div id="test" style="width: 100%;">
+    <div class="container-fluid">
+        <div class="example_row">
+            <div class = row>
+                <div class="col-sm-4">
+                    Uhrzeit: {% now "H:i" %}
+                </div>
+                <div class="col-sm-4">
+                </div>
+                <div class="col-sm-4" >
+                    <div class="float-right"> {% now "d.m.Y" %}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container d-flex align-items-center">
+    <img src="{% static 'Stromzeiten_app/images/logo.png' %}" alt="Logo" style="max-width: 10%;">    
+    <div>
+        <p class="main-headline" style="font-size: 50px; margin-bottom: -18px;">Stromzeiten</p>
+        <p>Verantwortungsbewusst mit grüner Energie!</p>
+        </div>
+    </div>
+</div>
+    
+
+
+<div class="container-fluid mb-1">
+    <div class="col my-4 px-0">
+        <p>Die Erzeugung erneuerbarer Energie deckt zwischen {{ data4.0.Date|date:"G:i"}} und {{ data4.1.Date|date:"G:i"}}  Uhr {{ data4.0.Renewable_Load_ratio}}% der Verbrauch ab</p>
+    </div>
+    <div class="row px-0" style="margin-left: 0px; margin-right: 0px;">
+        <div class="btn-group btn-group-toggle" data-toggle="buttons">
+            <label class="btn btn-secondary active">
+                <input type="radio" name="options" id="option1" autocomplete="off" checked> 24H
+            </label>
+            <label class="btn btn-secondary">
+                <input type="radio" name="options" id="option2" autocomplete="off"> 48H
+            </label>
+            <label class="btn btn-secondary">
+                <input type="radio" name="options" id="option3" autocomplete="off"> gesamt
+            </label>
+        </div>
+        <div class="ml-5 d-flex align-items-center">
+            <p>Aktuelle Stromzeit: {% if data4.0.Quality_ratio > 80 %} Best {% elif data4.0.Quality_ratio < 80 and data4.0.Quality_ratio > 50 %} Gut {% else%} Schlecht  {% endif %}</p>
+        </div>
+    </div>
+    <div class="row px-0" style="min-height: 60px; margin-left: 0px; margin-right: 0px;">
+        <div class="col-sm bg-green d-flex align-items-center justify-content-center">
+            beste
+        </div>
+        <div class="col-sm bg-yellow d-flex align-items-center justify-content-center">
+            <p>okay</p>
+        </div>
+        <div class="col-sm bg-red d-flex align-items-center justify-content-center">
+            <p>schlecht</p>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="row">
+    <div class="col-sm-6">
+        <div id="container" style="width: 100%;">
+            <canvas id="myChart"></canvas>
+        </div>
+    </div>
+    <div class="col-sm-6">
+        <div id="container" style="width: 100%;">
+            <canvas id="myChart2"></canvas>
+        </div>
+    </div>
+</div>
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+  <script>
+var ctx = document.getElementById('myChart').getContext('2d');
+var myChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: [{% for row in data %}'{{ row.Date|date:"G:i" }}',{% endfor %}],
+        datasets: [{
+            label: '% der besten Stromzeit',
+            data: [{% for row in data %}'{{ row.Quality_ratio }}',{% endfor %}],
+            pointBackgroundColor: function(context) {
+                var index = context.dataIndex;
+                var value = context.dataset.data[index];
+                if (value < 50) {
+                    return '#ed8562'
+                } else if (value  < 80 && value >= 50) {
+                    return '#edd74b'
+                } else {
+                    return '#21ed61'
+                }  
+            },
+            fill: false,
+            pointRadius: 5,
+            pointHoverRadius: 10,
+            borderWidth: 2
+        }]
+    },
+    options: {
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero: false,
+                }
+            }],
+            xAxes: [{
+                ticks: {
+                    autoSkip: true,
+                    maxTicksLimit: 24
+                }
+                //ticks: {
+                    //minor: {'0:30', '1:00'}
+                    //minor: {
+                    //    fontSize: 30
+                    //}
+                //}
+            }]
+        }
+    }
+});
+</script>
+
+<script>
+var ctx = document.getElementById('myChart2').getContext('2d');
+var myChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: [{% for row in data_forecast %}'{{ row.Date|date:"G:i" }}',{% endfor %}],
+        datasets: [{
+            label: '% der besten Stromzeit',
+            data: [{% for row in data_forecast %}'{{ row.Quality_ratio }}',{% endfor %}],
+            pointBackgroundColor: function(context) {
+                var index = context.dataIndex;
+                var value = context.dataset.data[index];
+                if (value < 50) {
+                    return '#ed8562'
+                } else if (value  < 80 && value >= 50) {
+                    return '#edd74b'
+                } else {
+                    return '#21ed61'
+                }                
+                
+                    
+            },
+            fill: false,
+            pointRadius: 5,
+            pointHoverRadius: 10,
+            borderWidth: 2
+        }]
+    },
+    options: {
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero: false,
+                }
+            }],
+            xAxes: [{
+                ticks: {
+                    autoSkip: true,
+                    maxTicksLimit: 24
+                }
+                //ticks: {
+                    //minor: {'0:30', '1:00'}
+                    //minor: {
+                    //    fontSize: 30
+                    //}
+                //}
+            }]
+        }
+    }
+});
+</script>
+
+
+
+{% endblock content %}

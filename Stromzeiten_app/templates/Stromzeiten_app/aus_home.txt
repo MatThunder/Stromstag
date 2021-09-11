@@ -1,0 +1,52 @@
+<section class="bg-green text-center">
+    <div class="row">
+    <div class="col-2">
+        test
+    </div>
+    <div class="col-md-5">
+        Beste Stromzeiten heute:
+        {% for row in data1 %}
+    <p> {{ row.Date_start|date:"G:i"}} bis {{ row.Date_end|date:"G:i"}} </p>
+         {% endfor %}
+    </div>
+        <div style="min-width: 20px"> </div>
+    <div class="col-md-5">
+         Beste Stromzeiten morgen:
+     {% for row in data1_forecast %}
+    <p> {{ row.Date_start|date:"G:i"}} bis {{ row.Date_end|date:"G:i"}} </p>
+         {% endfor %}
+    </div>
+    </div>
+    </section>
+    <section class="bg-yellow text-center">
+    <div class="row">
+    <div class="col-md-6">
+        Gute Stromzeiten heute:
+        {% for row in data2 %}
+    <p> {{ row.Date_start|date:"G:i"}} bis {{ row.Date_end|date:"G:i"}} </p>
+         {% endfor %}
+    </div>
+    <div class="col-md-6">
+         Gute Stromzeiten morgen:
+     {% for row in data2_forecast %}
+    <p> {{ row.Date_start|date:"G:i"}} bis {{ row.Date_end|date:"G:i"}} </p>
+         {% endfor %}
+    </div>
+    </div>
+    </section>
+    <section class="bg-red text-center">
+    <div class="row">
+    <div class="col-md-6">
+        Schlechte Stromzeiten heute:
+        {% for row in data3 %}
+    <p> {{ row.Date_start|date:"G:i"}} bis {{ row.Date_end|date:"G:i"}} </p>
+         {% endfor %}
+    </div>
+    <div class="col-md-6">
+        Schlechte Stromzeiten morgen:
+     {% for row in data3_forecast %}
+    <p> {{ row.Date_start|date:"G:i"}} bis {{ row.Date_end|date:"G:i"}} </p>
+         {% endfor %}
+    </div>
+    </div>
+    </section>
