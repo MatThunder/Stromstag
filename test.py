@@ -3,8 +3,6 @@ import sqlite3
 import pandas as pd
 from datetime import date, timedelta
 
-from pandas.core.frame import DataFrame
-
 
 def time_difference_checking(df):
         df['Timedelta'] = df['Date'] - df['Date'].shift(-1)
@@ -62,11 +60,9 @@ def data_base_connection(table_name, dataframe):
     sql = "SELECT * FROM " + table_name + ";"
     c.execute(sql)
     print("Database data:")
-    #for row in c.fetchall():
-        #print(row)
+    for row in c.fetchall():
+        print(row)
     #print(c.fetchall())
-
-
 
 
 #ENTSOE API connecntion
@@ -87,73 +83,7 @@ country_code = 'DE'
 load_raw = client.query_load_forecast(country_code, start=start, end=end)
 renewable = client.query_wind_and_solar_forecast(country_code, start=start, end=end)
 
+print (renewable)
+
 #formating load_raw to pandas dataframe
 load = pd.DataFrame(load_raw)
-
-#Algorithm
-renewable['Total'] = renewable['Solar']+renewable['Wind Offshore']+renewable['Wind Onshore']
-renewable['Renewable/Load_ratio'] = renewable['Total']/load[0]*100
-renewable['Quality_ratio'] = renewable['Renewable/Load_ratio']/renewable['Renewable/Load_ratio'].max()*100
-test=renewable.loc[start]
-print(test)
-test['Solar']=100.00
-#print (start_date)
-#test.name='2021-09-17 00:00:00+02:00'
-test.name=pd.Timestamp('20210917', tz='Europe/Brussels')
-#print(type(test.name))
-print(test)
-renewable=renewable.append(test)
-
-#renewable=renewable.append(renewable.loc[start])
-#print (renewable.loc[start])
-#print(start)
-print(renewable)
-
-#Fomrating data: date, rounding values, etc...
-renewable['Date'] = renewable.index
-renewable.insert(0, 'id', range(0 , len(renewable)))
-rounded_renewables = renewable['Quality_ratio'].round(decimals=1)
-renewable['Quality_ratio'] = rounded_renewables
-rounded_renewables = renewable['Renewable/Load_ratio'].round(decimals=1)
-renewable['Renewable/Load_ratio'] = rounded_renewables
-
-renewable.rename(columns={"Wind Offshore": "Wind_Offshore",
-                                "Wind Onshore": "Wind_Onshore", "Renewable/Load_ratio": "Renewable_Load_ratio"}, inplace=True)
-
-
-data_base_connection('Stromzeiten_app_stromzeiten_table', renewable)
-
-
-#Looking for a time spans with Quality_ratio < 50
-renewable.loc[renewable['Quality_ratio'] <50, 'equal_or_lower_than_50?'] = True
-df = renewable[['Quality_ratio', 'equal_or_lower_than_50?', 'Date']]
-df = df[df['equal_or_lower_than_50?'] == True]
-df_r=time_difference_checking(df)
-df2 = df_r[df_r['equal_or_lower_than_15?'] == True]
-dataframe_bad_times = time_periods_checking(df_r,df2)
-data_base_connection('Stromzeiten_app_schlechte_table', dataframe_bad_times)
-
-#Looking for a time spans with Quality_ratio > 80
-renewable.loc[renewable['Quality_ratio'] >80, 'equal_or_greater_than_80?'] = True
-df = renewable[['Quality_ratio', 'equal_or_greater_than_80?', 'Date']]
-df = df[df['equal_or_greater_than_80?'] == True]
-df_r=time_difference_checking(df)
-df2 = df_r[df_r['equal_or_lower_than_15?'] == True]
-dataframe_best_times = time_periods_checking(df_r,df2)
-data_base_connection('Stromzeiten_app_beste_table', dataframe_best_times)
-
-#Looking for a time spans with Quality_ratio between 50 and 80
-renewable.loc[renewable['Quality_ratio'].between(50, 80, inclusive=True), 'between_50_and_80?'] = True
-df = renewable[['Quality_ratio', 'between_50_and_80?', 'Date']]
-df.reset_index(drop=True)
-df=df[df['between_50_and_80?'] == True]
-df_r=time_difference_checking(df)
-df2 = df_r[df_r['equal_or_lower_than_15?'] == True]
-dataframe_good_times = time_periods_checking(df_r,df2)
-data_base_connection('Stromzeiten_app_gute_table', dataframe_good_times)
-
-
-
-
-
-
